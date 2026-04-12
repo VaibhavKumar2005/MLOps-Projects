@@ -31,7 +31,7 @@ This project aims to:
 
 ## 📂 Project Structure
 
-```
+```text
 stock-market-mlops/
 │
 ├── data/                  # Stored stock data (CSV files)
@@ -57,13 +57,13 @@ stock-market-mlops/
 
 ### 1. Install dependencies
 
-```
+```bash
 pip install yfinance pandas
 ```
 
 ### 2. Run the script
 
-```
+```bash
 python src/data_ingestion.py
 ```
 
