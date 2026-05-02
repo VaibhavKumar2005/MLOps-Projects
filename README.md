@@ -52,10 +52,10 @@ Container orchestration and workflow management:
 ## 🛠️ Tech Stack (Current)
 
 - **Languages:** Python
-- **Data Processing:** Pandas, NumPy
+- **Data Processing:** Pandas, NumPy, DVC (Data Version Control)
 - **ML/Modeling:** (To be integrated)
-- **DevOps:** Git, Docker (planned)
-- **Cloud:** (To be added)
+- **DevOps:** Git, Docker, GitHub Actions (CI/CD)
+- **Cloud:**GCP (planned)
 
 ## 🚀 Getting Started
 
@@ -74,6 +74,8 @@ MLOps-Projects/
 │   ├── data/               # Raw and processed data
 │   ├── src/                # Source code
 │   ├── notebooks/          # Experiments (optional)
+│   ├── .dvc/               # DVC configuration
+│   ├── dvc.yaml            # DVC pipeline definition
 │   └── README.md           # Project documentation
 ├── README.md               # This file
 └── .gitignore
