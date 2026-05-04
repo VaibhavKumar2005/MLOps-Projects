@@ -1,6 +1,6 @@
 import pandas as pd
 
-def create_features(data):
+def create_features(df):
     df['MA_10'] = df['Close'].rolling(window= 10).mean()
     df['MA_50'] = df['Close'].rolling(window= 50).mean()
 
