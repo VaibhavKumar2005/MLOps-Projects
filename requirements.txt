@@ -1,3 +1,32 @@
 yfinance
 pandas
 scikit-learn
+
+# Data versioning and pipelines
+dvc
+prefect
+
+# Experiment tracking
+mlflow
+
+# Data validation
+great-expectations
+pandera
+
+# Testing & code quality
+pytest
+black
+flake8
+
+# Data processing
+polars
+sqlalchemy
+
+# Visualization
+matplotlib
+seaborn
+plotly
+
+# Notebooks
+jupyter
+jupyterlab
