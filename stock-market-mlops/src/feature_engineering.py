@@ -1,6 +1,7 @@
 import pandas as pd
 
-def create_features(df):
+
+def create_features(df, include_target=True):
     df = df.copy()
 
     # Moving averages
@@ -17,8 +18,9 @@ def create_features(df):
     # Volatility
     df['Volatility'] = df['Return'].rolling(window=10).std()
 
-    # Target (next day price)
-    df['Target'] = df['Close'].shift(-1)
+    if include_target:
+        # Target (next day price)
+        df['Target'] = df['Close'].shift(-1)
 
     # Drop NaN
     df = df.dropna()

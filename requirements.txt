@@ -1,6 +1,7 @@
 yfinance
 pandas
 scikit-learn
+kafka-python
 
 # Data versioning and pipelines
 dvc

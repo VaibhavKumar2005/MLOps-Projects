@@ -50,6 +50,7 @@ stock-market-mlops/
 * 🔁 Multi-stock support (AAPL, TSLA, MSFT, etc.)
 * 💾 Store data locally in CSV format
 * 🧪 Basic debugging and validation
+* Kafka streaming stubs for raw and feature topics
 
 ---
 
@@ -70,6 +71,31 @@ python src/data_ingestion.py
 ### 3. Output
 
 CSV files will be saved in the `data/` folder.
+
+---
+
+## Kafka (Local Dev)
+
+### 1. Start Kafka
+
+```bash
+cd stock-market-mlops
+docker compose up -d
+```
+
+### 2. Stream CSV data to Kafka
+
+```bash
+python src/kafka_producer.py --ticker AAPL --file data/AAPL_stock_data.csv --sleep 0.1
+```
+
+### 3. Run feature consumer
+
+```bash
+python src/kafka_feature_engineering.py
+```
+
+Raw messages go to `stock.raw`, and engineered features go to `stock.features`.
 
 ---
 
