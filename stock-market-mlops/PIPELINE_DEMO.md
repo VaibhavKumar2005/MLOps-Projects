@@ -4,7 +4,7 @@
 
 Your complete real-time ML pipeline is **READY TO RUN**:
 
-```
+```text
 Market Data → Kafka Producer → Feature Engineering Consumer → Prediction Consumer → Drift Monitor
 ```
 
@@ -39,6 +39,7 @@ ls models/model.pkl
 ls src/
 ```
 
+
 ### Step 2: Start Docker Compose (Kafka + Zookeeper)
 
 ```bash
@@ -46,6 +47,7 @@ docker compose up -d
 ```
 
 **Verify Kafka is running:**
+
 ```bash
 docker ps
 # You should see both kafka and zookeeper containers running
@@ -61,7 +63,8 @@ python src/kafka_producer.py --ticker AAPL --file data/AAPL_stock_data.csv --sle
 ```
 
 **Expected Output:**
-```
+
+```text
 Successfully initialized KafkaProducer with brokers [localhost:9092]
 ... streaming messages ...
 ```
@@ -74,7 +77,8 @@ python src/kafka_feature_engineering.py
 ```
 
 **Expected Output:**
-```
+
+```text
 Consumer subscribed to ['stock.raw']
 📊 Computed features for symbol AAPL
 ... publishing features to stock.features topic ...
@@ -88,7 +92,8 @@ python src/prediction_consumer.py
 ```
 
 **Expected Output:**
-```
+
+```text
 ✅ Model loaded from models/model.pkl
 🚀 Starting prediction consumer...
 📡 Listening on topic: stock.features
@@ -104,7 +109,8 @@ python src/drift_monitor.py
 ```
 
 **Expected Output:**
-```
+
+```text
 📊 Baseline set for price: μ=150.0000, σ=15.0000
 📊 Baseline set for return: μ=0.0000, σ=0.0200
 📊 Baseline set for volatility: μ=0.0150, σ=0.0050
@@ -120,7 +126,7 @@ python src/drift_monitor.py
 
 Your CSV has metadata rows that were causing parsing errors:
 
-```
+```text
 Row 0: Price,Close,High,Low,Open,Volume    ← Header
 Row 1: Ticker,AAPL,AAPL,AAPL,AAPL,AAPL    ← Metadata (skipped)
 Row 2: Date,,,,,                            ← Metadata (skipped)
@@ -128,6 +134,7 @@ Row 3: 2010-01-04,6.41,...                  ← Data starts here
 ```
 
 **Solution Applied:**
+
 ```python
 df = pd.read_csv(
     "data/AAPL_stock_data.csv",
@@ -148,7 +155,7 @@ Files updated:
 
 ### Data Flow Through Topics
 
-```
+```text
 STAGE 1: RAW DATA (stock.raw topic)
 ├─ Payload: {symbol, timestamp, open, high, low, close, volume}
 ├─ Example: {"symbol": "AAPL", "close": 6.41, "volume": 493729600}
@@ -186,6 +193,7 @@ STAGE 3b: DRIFT ALERTS
 - [ ] Prediction consumer shows "💰 AAPL | Time: ... | Predicted: ..."
 - [ ] Drift monitor shows "✅ AAPL | Price: μ=..., σ=..."
 - [ ] No error messages about missing topics or connection refused
+
 
 ---
 
@@ -268,7 +276,7 @@ Once the pipeline runs successfully:
 ## 🎓 What This Pipeline Demonstrates
 
 | Concept | Where It Shines |
-|---------|-----------------|
+| --- | --- |
 | **Real-Time Data Streaming** | Kafka producer/consumer pattern |
 | **Stateful Feature Engineering** | Buffering 60+ records for MA computation |
 | **ML Inference at Scale** | Prediction consumer handles multiple symbols |

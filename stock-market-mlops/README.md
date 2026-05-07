@@ -6,7 +6,7 @@ A **production-grade streaming ML pipeline** for financial data. This system ing
 
 This is not a toy project. This is how modern ML systems work:
 
-```
+```text
 Market Data → Kafka → Feature Engineering → ML Inference → Drift Monitoring
 ```
 
@@ -15,6 +15,7 @@ Market Data → Kafka → Feature Engineering → ML Inference → Drift Monitor
 ## 🧠 Problem Statement
 
 Stock market data is:
+
 - **Dynamic**: Distributions shift constantly
 - **Streaming**: New prices arrive continuously
 - **Production-critical**: Models must adapt in real-time
@@ -26,7 +27,7 @@ Traditional batch ML doesn't work. You need streaming architecture.
 ## 🛠️ Tech Stack
 
 | Category | Tech |
-|----------|------|
+| --- | --- |
 | **Streaming** | Apache Kafka |
 | **ML Framework** | scikit-learn, MLflow |
 | **Data Management** | DVC, Pandas |
@@ -67,7 +68,7 @@ stock-market-mlops/
 
 ## ⚙️ Architecture: Real-Time ML Pipeline
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────┐
 │                   STREAMING ML PIPELINE                      │
 └──────────────────────────────────────────────────────────────┘
@@ -140,6 +141,7 @@ pip install -r requirements.txt
 docker --version
 ```
 
+
 ### 1. Start Kafka + Zookeeper
 
 ```bash
@@ -148,6 +150,7 @@ docker compose up -d
 ```
 
 Verify Kafka is running:
+
 ```bash
 docker ps
 ```
@@ -161,7 +164,8 @@ python src/train_model.py
 This trains a LinearRegression model on AAPL data and saves to `models/model.pkl`.
 
 **Output:**
-```
+
+```text
 ✅ Mean Squared Error: 12.34
 ✅ Model saved to models/model.pkl
 ```
@@ -169,6 +173,7 @@ This trains a LinearRegression model on AAPL data and saves to `models/model.pkl
 ### 3. Stream Raw Data to Kafka
 
 In terminal 1:
+
 ```bash
 python src/kafka_producer.py --ticker AAPL --file data/AAPL_stock_data.csv --sleep 0.1
 ```
@@ -178,6 +183,7 @@ This sends OHLCV data to the `stock.raw` Kafka topic.
 ### 4. Run Feature Engineering Consumer
 
 In terminal 2:
+
 ```bash
 python src/kafka_feature_engineering.py
 ```
@@ -187,6 +193,7 @@ This reads from `stock.raw`, aggregates 60+ bars, and publishes engineered featu
 ### 5. Run Prediction Consumer ⭐
 
 In terminal 3:
+
 ```bash
 python src/prediction_consumer.py
 ```
@@ -194,7 +201,8 @@ python src/prediction_consumer.py
 This reads from `stock.features` and makes real-time price predictions.
 
 **Output:**
-```
+
+```text
 💰 AAPL   | Time: 2024-01-15T10:30:00 | Current: $150.25 | Predicted: $151.42
 💰 AAPL   | Time: 2024-01-15T10:31:00 | Current: $150.50 | Predicted: $151.67
 ```
@@ -202,6 +210,7 @@ This reads from `stock.features` and makes real-time price predictions.
 ### 6. (Optional) Run Drift Monitor ⭐
 
 In terminal 4:
+
 ```bash
 python src/drift_monitor.py
 ```
@@ -209,7 +218,8 @@ python src/drift_monitor.py
 This monitors feature distributions and alerts on drift.
 
 **Output:**
-```
+
+```text
 ✅ AAPL   | Price: μ=150.25, σ=2.34 | Return: μ=0.0015, σ=0.0082
 ⚠️  DRIFT ALERT for AAPL: Price drift ($175.50)
 ```
@@ -219,28 +229,33 @@ This monitors feature distributions and alerts on drift.
 ## 📊 How Each Component Works
 
 ### `kafka_producer.py` - Raw Data Streaming
+
 - Reads historical CSV files
 - Streams rows to `stock.raw` topic
 - Payload: `{symbol, timestamp, open, high, low, close, volume}`
 
 ### `kafka_feature_engineering.py` - Stateful Aggregation
+
 - Buffers 60+ raw records per symbol
 - Computes features: MA, returns, volatility
 - Publishes to `stock.features` topic
 - Payload: `{symbol, timestamp, MA_10, MA_50, Return, Lag_1, Lag_2, Volatility, close}`
 
 ### `prediction_consumer.py` - ML Inference ⭐
+
 - Loads trained scikit-learn model
 - Subscribes to `stock.features` topic
 - Makes real-time price predictions
 - Logs predictions to console
 
 **Key features:**
+
 - Handles missing values gracefully
 - Validates feature order
 - Tracks predictions per symbol
 
 ### `drift_monitor.py` - Data Quality Monitoring ⭐
+
 - Tracks rolling mean/std of key metrics
 - Compares against training distribution baseline
 - Alerts when Z-score > threshold (default: 2σ)
@@ -248,8 +263,6 @@ This monitors feature distributions and alerts on drift.
   - Price drift
   - Return drift
   - Volatility drift
-
----
 
 ## 🧪 Testing the Pipeline
 
@@ -285,8 +298,6 @@ python src/prediction_consumer.py
 python src/drift_monitor.py
 ```
 
----
-
 ## 📈 Model Training & Experimentation
 
 ### View Experiment Results
@@ -299,6 +310,7 @@ mlflow ui
 ```
 
 MLflow tracks:
+
 - Mean Squared Error (MSE)
 - Model artifacts
 - Training data source
@@ -311,47 +323,54 @@ python src/train_model.py
 
 A new run is logged automatically.
 
----
-
 ## 🔧 Configuration
 
 Edit [src/config.py](src/config.py) to change:
+
 - Kafka bootstrap servers
 - Topic names
 - Consumer group IDs
 
----
-
 ## 🚨 Troubleshooting
 
 ### Kafka Connection Error
-```
+
+```text
 Connection refused to localhost:9092
 ```
+
 **Solution:** Ensure `docker compose up -d` is running:
+
 ```bash
 docker compose logs kafka
 ```
 
 ### Model Not Found
-```
+
+```text
 FileNotFoundError: models/model.pkl
 ```
+
 **Solution:** Train the model first:
+
 ```bash
 python src/train_model.py
 ```
 
 ### No Messages in Consumer
-```
+
+```text
 Waiting for messages... (nothing appears)
 ```
+
 **Solution:**
+
 1. Check producer is sending data: `docker compose logs kafka`
 2. Verify correct topic name in config
 3. Use `docker exec kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic stock.raw --from-beginning`
 
 ### DVC Data Not Synced
+
 ```bash
 git lfs install
 dvc pull
@@ -415,7 +434,6 @@ Stock predictions are not guaranteed and should never be used for real trading d
 
 Vaibhav Kumar
 
----
 
 ## 📖 References
 
