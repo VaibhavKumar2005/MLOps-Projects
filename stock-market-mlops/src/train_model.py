@@ -15,7 +15,8 @@ def train_model():
     os.makedirs("models", exist_ok=True)
     
     # Load and process data
-    df = pd.read_csv("data/AAPL_stock_data.csv", index_col=0, parse_dates=True)
+    # Keep header row 0, skip metadata rows 1-2 (Ticker and Date), use first column as index
+    df = pd.read_csv("data/AAPL_stock_data.csv", header=0, index_col=0, skiprows=[1, 2], parse_dates=True)
     df = create_features(df)
 
     # Prepare features and target

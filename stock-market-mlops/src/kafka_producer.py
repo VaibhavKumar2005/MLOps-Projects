@@ -19,7 +19,7 @@ def build_producer():
 
 
 def stream_csv(ticker, file_path, sleep_seconds=0.0):
-    df = pd.read_csv(file_path, index_col=0, parse_dates=True)
+    df = pd.read_csv(file_path, header=0, index_col=0, skiprows=[1, 2], parse_dates=True)
 
     producer = build_producer()
     try:
