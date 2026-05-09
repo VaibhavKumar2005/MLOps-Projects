@@ -2,6 +2,7 @@ yfinance
 pandas
 scikit-learn
 kafka-python
+websocket-client
 
 # Data versioning and pipelines
 dvc

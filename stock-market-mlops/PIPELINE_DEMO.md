@@ -69,6 +69,22 @@ Successfully initialized KafkaProducer with brokers [localhost:9092]
 ... streaming messages ...
 ```
 
+#### (Optional) Near-Real-Time Producer (Free)
+
+This uses Twelve Data's websocket feed and sends ticks to `stock.raw`.
+
+```bash
+setx TWELVEDATA_API_KEY "YOUR_API_KEY"
+python src/twelvedata_producer.py --symbols AAPL,MSFT,TSLA
+```
+
+PowerShell for the current session:
+
+```bash
+$env:TWELVEDATA_API_KEY="YOUR_API_KEY"
+python src/twelvedata_producer.py --symbols AAPL,MSFT,TSLA
+```
+
 #### Terminal 2: Feature Engineering Consumer
 
 ```bash

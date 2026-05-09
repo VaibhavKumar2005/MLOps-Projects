@@ -77,6 +77,7 @@ stock-market-mlops/
 │   ├── data_ingestion.py              # yFinance data fetcher
 │   ├── feature_engineering.py         # Feature computation logic
 │   ├── kafka_producer.py              # Raw data → Kafka streamer
+│   ├── twelvedata_producer.py         # Near-real-time prices → Kafka streamer
 │   ├── kafka_feature_engineering.py   # Raw events → Feature computation
 │   ├── train_model.py                 # Model training w/ MLflow logging
 │   ├── prediction_consumer.py         # Feature events → Predictions
@@ -302,6 +303,28 @@ python src/kafka_producer.py --ticker AAPL --file data/AAPL_stock_data.csv --sle
 ```
 
 This sends OHLCV data to the `stock.raw` Kafka topic.
+
+### 3b. (Optional) Stream Near-Real-Time Data (Free)
+
+This uses Twelve Data's free websocket feed. It publishes price ticks to `stock.raw` and maps the price into OHLCV fields (open/high/low/close all equal to price, volume set to 0).
+
+Set your API key:
+
+```bash
+setx TWELVEDATA_API_KEY "YOUR_API_KEY"
+```
+
+For the current PowerShell session:
+
+```bash
+$env:TWELVEDATA_API_KEY="YOUR_API_KEY"
+```
+
+Then run the producer:
+
+```bash
+python src/twelvedata_producer.py --symbols AAPL,MSFT,TSLA
+```
 
 ### 4. Run Feature Engineering Consumer
 
