@@ -19,9 +19,10 @@ def build_producer():
 
 
 def stream_csv(ticker, file_path, sleep_seconds=0.0):
+    """Stream CSV data to Kafka topic (local testing)."""
     df = pd.read_csv(file_path, header=0, index_col=0, skiprows=[1, 2], parse_dates=True)
-
     producer = build_producer()
+    
     try:
         for index, row in df.iterrows():
             payload = {
@@ -42,16 +43,17 @@ def stream_csv(ticker, file_path, sleep_seconds=0.0):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Stream CSV stock bars to Kafka.")
-    parser.add_argument("--ticker", required=True, help="Stock ticker symbol.")
+    parser = argparse.ArgumentParser(description="Stream CSV stock data to Kafka (local testing).")
+    parser.add_argument("--ticker", required=True, help="Stock ticker symbol (e.g., AAPL).")
     parser.add_argument("--file", required=True, help="Path to CSV data file.")
-    parser.add_argument("--sleep", type=float, default=0.0, help="Seconds between messages.")
-
+    parser.add_argument("--sleep", type=float, default=0.0, help="Delay between messages (seconds).")
+    
     args = parser.parse_args()
     csv_path = Path(args.file)
+    
     if not csv_path.exists():
         raise FileNotFoundError(f"CSV file not found: {csv_path}")
-
+    
     stream_csv(args.ticker, csv_path, args.sleep)
 
 
