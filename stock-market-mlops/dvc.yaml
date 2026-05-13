@@ -1,0 +1,59 @@
+stages:
+  data_ingestion:
+    cmd: python -m src.data_ingestion
+    deps:
+      - src/data_ingestion.py
+      - src/config.py
+      - data/AAPL_stock_data.csv
+      - data/MSFT_stock_data.csv
+      - data/TSLA_stock_data.csv
+    outs:
+      - data/processed:
+          cache: true
+    metrics:
+      - metrics/data_ingestion.json:
+          cache: false
+    plots:
+      - metrics/data_summary.csv:
+          x: symbol
+          y: count
+
+  feature_engineering:
+    cmd: python -m src.feature_engineering
+    deps:
+      - src/feature_engineering.py
+      - src/config.py
+      - data/processed
+    outs:
+      - data/features:
+          cache: true
+    metrics:
+      - metrics/features.json:
+          cache: false
+
+  train_model:
+    cmd: python -m src.train_model
+    deps:
+      - src/train_model.py
+      - src/config.py
+      - data/features
+    outs:
+      - models/model.pkl:
+          cache: true
+    metrics:
+      - metrics/training.json:
+          cache: false
+    plots:
+      - metrics/model_performance.csv:
+          x: epoch
+          y: loss
+
+  drift_monitoring:
+    cmd: python -m src.drift_monitor
+    deps:
+      - src/drift_monitor.py
+      - src/config.py
+      - models/model.pkl
+    metrics:
+      - metrics/drift.json:
+          cache: false

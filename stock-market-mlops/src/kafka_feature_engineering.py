@@ -75,11 +75,17 @@ def main():
             if features.empty:
                 continue
 
-            latest = features.tail(1).iloc[0].to_dict()
+            latest_row = features.tail(1).iloc[0]
             feature_payload = {
                 "symbol": symbol,
                 "timestamp": features.tail(1).index[0].isoformat(),
-                "features": latest,
+                "close": float(latest_row["Close"]),
+                "MA_10": float(latest_row["MA_10"]),
+                "MA_50": float(latest_row["MA_50"]),
+                "Return": float(latest_row["Return"]),
+                "Lag_1": float(latest_row["Lag_1"]),
+                "Lag_2": float(latest_row["Lag_2"]),
+                "Volatility": float(latest_row["Volatility"]),
             }
             producer.send(KAFKA_FEATURES_TOPIC, key=symbol, value=feature_payload)
     finally:

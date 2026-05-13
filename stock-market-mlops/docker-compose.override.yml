@@ -1,0 +1,88 @@
+# Development overrides for docker-compose.yml
+# Extends production config with development-specific settings
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.override.yml up
+
+version: "3.8"
+
+services:
+  producer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./models:/app/models
+    environment:
+      - DEBUG=True
+      - LOG_LEVEL=DEBUG
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "5678:5678"  # Debug port
+
+  feature-engineering:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./models:/app/models
+    environment:
+      - DEBUG=True
+      - LOG_LEVEL=DEBUG
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "5679:5679"  # Debug port
+
+  prediction:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./models:/app/models
+    environment:
+      - DEBUG=True
+      - LOG_LEVEL=DEBUG
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "5680:5680"  # Debug port
+
+  drift-monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./models:/app/models
+    environment:
+      - DEBUG=True
+      - LOG_LEVEL=DEBUG
+      - PYTHONUNBUFFERED=1
+      - DRIFT_CHECK_INTERVAL=10  # More frequent checks in dev
+    ports:
+      - "5681:5681"  # Debug port
+
+  mlflow:
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+      - mlflow-artifacts:/mlflow/artifacts
+
+  dvc-storage:
+    image: alpine:latest
+    volumes:
+      - dvc-storage:/dvc_storage
+    command: /bin/sh -c "while true; do sleep 3600; done"
+
+volumes:
+  mlflow-artifacts:
+  dvc-storage:
