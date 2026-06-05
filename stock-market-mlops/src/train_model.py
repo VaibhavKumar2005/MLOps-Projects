@@ -31,7 +31,7 @@ def train_model():
     # Train model with MLflow tracking
     mlflow.set_experiment("stock-market-experiment")
     
-    with mlflow.start_run():
+    with mlflow.start_run() as run:
         # Train model
         model = LinearRegression()
         model.fit(X_train, y_train)
@@ -45,10 +45,25 @@ def train_model():
         # Log metrics
         mlflow.log_metric("mse", mse)
         
-        # Log model
-        mlflow.sklearn.log_model(model, "model")
+        # Log model with registry
+        model_name = "stock_predictor"
+        mlflow.sklearn.log_model(
+            sk_model=model, 
+            artifact_path="model",
+            registered_model_name=model_name
+        )
         
-        # Save model locally
+        # Promote to Staging automatically
+        client = mlflow.tracking.MlflowClient()
+        model_version = client.get_latest_versions(model_name, stages=["None"])[0].version
+        client.transition_model_version_stage(
+            name=model_name,
+            version=model_version,
+            stage="Staging"
+        )
+        print(f"✅ Model registered as '{model_name}' version {model_version} and promoted to 'Staging'")
+
+        # Save model locally (legacy support)
         joblib.dump(model, "models/model.pkl")
         print("Model saved to models/model.pkl")
         

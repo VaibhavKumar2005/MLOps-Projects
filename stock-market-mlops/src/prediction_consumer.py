@@ -1,6 +1,7 @@
 import json
 import joblib
 import logging
+import mlflow.sklearn
 from kafka import KafkaConsumer
 from datetime import datetime
 
@@ -21,15 +22,21 @@ logger = logging.getLogger(__name__)
 class PredictionConsumer:
     """Consumes engineered features from Kafka and produces real-time predictions."""
     
-    def __init__(self, model_path="models/model.pkl"):
-        """Initialize prediction consumer with trained model."""
+    def __init__(self, model_name="stock_predictor", stage="Production"):
+        """Initialize prediction consumer with model from MLflow Registry."""
         try:
-            self.model = joblib.load(model_path)
-            logger.info(f"✅ Model loaded from {model_path}")
-        except FileNotFoundError:
-            logger.error(f"❌ Model not found at {model_path}")
-            logger.error("   Please run: python src/train_model.py")
-            raise
+            # Try to load from MLflow Registry
+            model_uri = f"models:/{model_name}/{stage}"
+            self.model = mlflow.sklearn.load_model(model_uri)
+            logger.info(f"✅ Model loaded from MLflow Registry: {model_uri}")
+        except Exception as e:
+            logger.warning(f"⚠️  Could not load from MLflow Registry ({e}). Falling back to local file.")
+            try:
+                self.model = joblib.load("models/model.pkl")
+                logger.info("✅ Model loaded from local fallback: models/model.pkl")
+            except FileNotFoundError:
+                logger.error("❌ No model found at all. Please run: python src/train_model.py")
+                raise
         
         self.feature_columns = ['MA_10', 'MA_50', 'Return', 'Lag_1', 'Lag_2', 'Volatility']
         self.predictions = {}

@@ -1,13 +1,15 @@
 import json
 import logging
 from collections import defaultdict, deque
-from kafka import KafkaConsumer
+from kafka import KafkaConsumer, KafkaProducer
 import numpy as np
+from datetime import datetime
 
 from config import (
     KAFKA_BOOTSTRAP_SERVERS,
     KAFKA_CLIENT_ID,
     KAFKA_FEATURES_TOPIC,
+    KAFKA_DRIFT_ALERTS_TOPIC,
 )
 
 # Configure logging
@@ -51,7 +53,29 @@ class DriftMonitor:
         }
         
         self.drift_alerts = defaultdict(list)
+        self.producer = self.build_producer()
     
+    def build_producer(self):
+        """Build Kafka producer for alerts."""
+        return KafkaProducer(
+            bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
+            value_serializer=lambda v: json.dumps(v).encode("utf-8")
+        )
+
+    def send_alert(self, metric_name, value, symbol, z_score):
+        """Send drift alert to Kafka."""
+        alert_payload = {
+            "type": "DRIFT_ALERT",
+            "metric": metric_name,
+            "value": value,
+            "symbol": symbol,
+            "z_score": z_score,
+            "threshold": self.drift_threshold,
+            "timestamp": datetime.now().isoformat()
+        }
+        self.producer.send(KAFKA_DRIFT_ALERTS_TOPIC, alert_payload)
+        logger.warning(f"🚨 DRIFT ALERT SENT: {symbol} {metric_name} z-score={z_score:.2f}")
+
     def set_baseline(self, metric_name, mean, std):
         """Set baseline statistics for a metric."""
         if metric_name in self.baselines:
@@ -92,6 +116,7 @@ class DriftMonitor:
         z_score = abs((value - baseline['mean']) / (baseline['std'] + 1e-9))
         
         if z_score > self.drift_threshold:
+            self.send_alert(metric_name, value, symbol, z_score)
             return True
         
         return False

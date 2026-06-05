@@ -3,4 +3,5 @@ __pycache__/
 data/*.csv
 .env
 stock-market-mlops/mlruns/
-stock-market-mlops/models/
+stock-market-mlops/models/.idea/
+*.db
