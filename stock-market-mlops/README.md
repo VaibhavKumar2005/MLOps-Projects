@@ -4,7 +4,7 @@
 
 A **production-grade event-driven streaming ML pipeline** for real-time financial data analysis. This system demonstrates how modern ML systems process continuous data streams: ingesting market data via Apache Kafka, engineering features in real-time, making predictions, and monitoring data drift—all without batch jobs.
 
-```text
+```
 Market Data Stream → Kafka Events → Real-Time Feature Engineering → ML Inference → Drift Monitoring
 ```
 
@@ -76,6 +76,7 @@ When drift is detected (z-score > threshold), the system:
 3. Enables downstream systems (retraining orchestrators) to respond automatically
 
 **Example Alert**:
+
 ```json
 {
   "type": "DRIFT_ALERT",
@@ -94,13 +95,15 @@ This enables a **true feedback loop**: `Detect → Alert → Trigger → Retrain
 
 ## 🧠 Problem Statement & Solution
 
-**The Challenge:**
+### The Challenge
+
 - Stock market data arrives **continuously** with **no fixed schedule**
 - Model distributions **shift constantly** (market regime changes)
 - Traditional batch ML is **too slow**: by the time you retrain, the model is stale
 - **Production ML requires sub-second latency** for predictions
 
-**The Solution: Event-Driven Architecture**
+### The Solution: Event-Driven Architecture
+
 - Each market price update triggers a chain of computations
 - Features are engineered on incoming events (not batched)
 - Predictions happen **immediately** as features become available
@@ -126,7 +129,7 @@ This enables a **true feedback loop**: `Detect → Alert → Trigger → Retrain
 
 Event-driven systems require explicit contracts between producers and consumers. This project maintains **JSON Schema** definitions for all Kafka topics:
 
-```text
+```
 schemas/
 ├── stock_raw.json          # Raw OHLCV events (yfinance / WebSocket)
 ├── stock_features.json     # Engineered features (MA, Volatility, Lags)
@@ -139,7 +142,7 @@ schemas/
 
 ## �📂 Project Structure
 
-```text
+```
 stock-market-mlops/
 │
 ├── schemas/                           # Kafka topic event schemas
@@ -386,7 +389,7 @@ This trains a LinearRegression model on AAPL data and saves to `models/model.pkl
 
 **Output:**
 
-```text
+```
 ✅ Mean Squared Error: 12.34
 ✅ Model saved to models/model.pkl
 ```
@@ -445,7 +448,7 @@ This reads from `stock.features` and makes real-time price predictions.
 
 **Output:**
 
-```text
+```
 💰 AAPL   | Time: 2024-01-15T10:30:00 | Current: $150.25 | Predicted: $151.42
 💰 AAPL   | Time: 2024-01-15T10:31:00 | Current: $150.50 | Predicted: $151.67
 ```
@@ -462,7 +465,7 @@ This monitors feature distributions and alerts on drift.
 
 **Output:**
 
-```text
+```
 ✅ AAPL   | Price: μ=150.25, σ=2.34 | Return: μ=0.0015, σ=0.0082
 ⚠️  DRIFT ALERT for AAPL: Price drift ($175.50)
 ```
@@ -1018,7 +1021,7 @@ Edit [src/config.py](src/config.py) to change:
 
 ### Kafka Connection Error
 
-```text
+```
 Connection refused to localhost:9092
 ```
 
@@ -1030,7 +1033,7 @@ docker compose logs kafka
 
 ### Model Not Found
 
-```text
+```
 FileNotFoundError: models/model.pkl
 ```
 
@@ -1042,7 +1045,7 @@ python src/train_model.py
 
 ### No Messages in Consumer
 
-```text
+```
 Waiting for messages... (nothing appears)
 ```
 
