@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Stock Features Event",
+  "description": "Engineered features computed from raw market data stream",
+  "type": "object",
+  "required": ["symbol", "timestamp", "MA_10", "MA_50", "Return", "Lag_1", "Lag_2", "Volatility"],
+  "properties": {
+    "symbol": {
+      "type": "string",
+      "description": "Stock ticker symbol",
+      "minLength": 1,
+      "maxLength": 10
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the feature computation"
+    },
+    "MA_10": {
+      "type": "number",
+      "description": "10-period moving average of close price"
+    },
+    "MA_50": {
+      "type": "number",
+      "description": "50-period moving average of close price"
+    },
+    "Return": {
+      "type": "number",
+      "description": "Log return from previous close"
+    },
+    "Lag_1": {
+      "type": "number",
+      "description": "Previous period's log return (lag-1 feature)"
+    },
+    "Lag_2": {
+      "type": "number",
+      "description": "Two periods ago log return (lag-2 feature)"
+    },
+    "Volatility": {
+      "type": "number",
+      "description": "Rolling volatility (standard deviation of returns)",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Stock Raw Event",
+  "description": "Raw OHLCV market data event from streaming source",
+  "type": "object",
+  "required": ["symbol", "timestamp", "open", "high", "low", "close", "volume"],
+  "properties": {
+    "symbol": {
+      "type": "string",
+      "description": "Stock ticker symbol (e.g., AAPL, MSFT, TSLA)",
+      "minLength": 1,
+      "maxLength": 10
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of the price bar"
+    },
+    "open": {
+      "type": "number",
+      "description": "Opening price for the period"
+    },
+    "high": {
+      "type": "number",
+      "description": "Highest price during the period"
+    },
+    "low": {
+      "type": "number",
+      "description": "Lowest price during the period"
+    },
+    "close": {
+      "type": "number",
+      "description": "Closing price for the period"
+    },
+    "volume": {
+      "type": "integer",
+      "description": "Trading volume during the period",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": false
+}
