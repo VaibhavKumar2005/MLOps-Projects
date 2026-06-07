@@ -1,9 +1,10 @@
 import pandas as pd
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
+from xgboost import XGBRegressor
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 import joblib
 import mlflow
 import os
+import json
 from pathlib import Path
 from feature_engineering import create_features
 
@@ -32,23 +33,54 @@ def train_model():
     mlflow.set_experiment("stock-market-experiment")
     
     with mlflow.start_run() as run:
-        # Train model
-        model = LinearRegression()
-        model.fit(X_train, y_train)
+        # Train XGBoost model
+        model = XGBRegressor(
+            n_estimators=100,
+            max_depth=6,
+            learning_rate=0.1,
+            random_state=42,
+            early_stopping_rounds=10
+        )
+        model.fit(
+            X_train, y_train,
+            eval_set=[(X_test, y_test)],
+            verbose=False
+        )
 
         # Make predictions and evaluate
         preds = model.predict(X_test)
         mse = mean_squared_error(y_test, preds)
+        mae = mean_absolute_error(y_test, preds)
+        r2 = r2_score(y_test, preds)
         
-        print(f"Mean Squared Error: {mse}")
+        print(f"Mean Squared Error: {mse:.4f}")
+        print(f"Mean Absolute Error: {mae:.4f}")
+        print(f"R² Score: {r2:.4f}")
 
         # Log metrics
         mlflow.log_metric("mse", mse)
+        mlflow.log_metric("mae", mae)
+        mlflow.log_metric("r2_score", r2)
+        
+        # Log feature importance
+        feature_importance = dict(zip(
+            X_train.columns,
+            model.feature_importances_
+        ))
+        # Sort by importance
+        feature_importance = dict(
+            sorted(feature_importance.items(), key=lambda x: x[1], reverse=True)
+        )
+        mlflow.log_dict(feature_importance, "feature_importance.json")
+        
+        print("\nFeature Importance:")
+        for feature, importance in feature_importance.items():
+            print(f"  {feature:15s} {importance:6.4f}")
         
         # Log model with registry
         model_name = "stock_predictor"
-        mlflow.sklearn.log_model(
-            sk_model=model, 
+        mlflow.xgboost.log_model(
+            xgb_model=model, 
             artifact_path="model",
             registered_model_name=model_name
         )

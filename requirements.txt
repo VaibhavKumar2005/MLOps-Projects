@@ -1,6 +1,7 @@
 yfinance
 pandas
 scikit-learn
+xgboost
 kafka-python
 websocket-client
 
