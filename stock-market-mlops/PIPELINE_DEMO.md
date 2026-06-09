@@ -25,12 +25,15 @@ Market Data → Kafka Producer → Feature Engineering Consumer → Prediction C
 
 ## 🎯 How to Run the Full Pipeline
 
-### Step 1: Verify Setup
+### Step 1: Prerequisites
 
 ```bash
-# Check you're in the right directory
+# Install dependencies
+pip install -r requirements.txt
+
+# Verify you're in the stock-market-mlops directory
+cd stock-market-mlops
 pwd
-# Should show: C:\Users\vaibh\OneDrive\Desktop\MLOps Projects\stock-market-mlops
 
 # Check model exists
 ls models/model.pkl
@@ -58,7 +61,7 @@ docker ps
 #### Terminal 1: Kafka Producer (Stream Raw Data)
 
 ```bash
-cd "c:\Users\vaibh\OneDrive\Desktop\MLOps Projects\stock-market-mlops"
+# From the stock-market-mlops directory
 python src/kafka_producer.py --ticker AAPL --file data/AAPL_stock_data.csv --sleep 0.1
 ```
 
@@ -74,13 +77,11 @@ Successfully initialized KafkaProducer with brokers [localhost:9092]
 This uses Twelve Data's websocket feed and sends ticks to `stock.raw`.
 
 ```bash
-setx TWELVEDATA_API_KEY "YOUR_API_KEY"
+# Set API key (Linux/Mac)
+export TWELVEDATA_API_KEY="YOUR_API_KEY"
 python src/twelvedata_producer.py --symbols AAPL,MSFT,TSLA
-```
 
-PowerShell for the current session:
-
-```bash
+# Or Windows (PowerShell)
 $env:TWELVEDATA_API_KEY="YOUR_API_KEY"
 python src/twelvedata_producer.py --symbols AAPL,MSFT,TSLA
 ```
@@ -88,7 +89,6 @@ python src/twelvedata_producer.py --symbols AAPL,MSFT,TSLA
 #### Terminal 2: Feature Engineering Consumer
 
 ```bash
-cd "c:\Users\vaibh\OneDrive\Desktop\MLOps Projects\stock-market-mlops"
 python src/kafka_feature_engineering.py
 ```
 
@@ -103,7 +103,6 @@ Consumer subscribed to ['stock.raw']
 #### Terminal 3: Prediction Consumer ⭐ (NEW)
 
 ```bash
-cd "c:\Users\vaibh\OneDrive\Desktop\MLOps Projects\stock-market-mlops"
 python src/prediction_consumer.py
 ```
 
@@ -120,7 +119,6 @@ python src/prediction_consumer.py
 #### Terminal 4: Drift Monitor ⭐ (NEW)
 
 ```bash
-cd "c:\Users\vaibh\OneDrive\Desktop\MLOps Projects\stock-market-mlops"
 python src/drift_monitor.py
 ```
 

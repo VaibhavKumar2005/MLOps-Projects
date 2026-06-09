@@ -59,7 +59,24 @@ Container orchestration and workflow management:
 
 ## 🚀 Getting Started
 
-Each project has its own detailed README with setup instructions. Start with:
+### Quick Start (Stock Market Pipeline - Working ✅)
+
+```bash
+cd stock-market-mlops
+pip install -r requirements.txt
+docker compose up -d
+python src/kafka_producer.py --ticker AAPL --file data/AAPL_stock_data.csv --sleep 0.1
+# Open 3 more terminals and run:
+python src/kafka_feature_engineering.py
+python src/prediction_consumer.py
+python src/drift_monitor.py
+```
+
+See [stock-market-mlops/PIPELINE_DEMO.md](./stock-market-mlops/PIPELINE_DEMO.md) for full walkthrough.
+
+### Detailed Setup
+
+Each project has its own detailed README with setup instructions:
 
 ```bash
 cd stock-market-mlops

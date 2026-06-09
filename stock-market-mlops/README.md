@@ -93,6 +93,37 @@ This enables a **true feedback loop**: `Detect → Alert → Trigger → Retrain
 
 ---
 
+## 📋 Prerequisites
+
+- **Python 3.8+**
+- **Docker & Docker Compose** (for Kafka + Zookeeper)
+- **pip** or **conda** for Python package management
+- **Git** for version control
+
+## 🚀 Quick Start
+
+```bash
+# 1. Clone and navigate
+cd stock-market-mlops
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Start Kafka infrastructure
+docker compose up -d
+
+# 4. Run the pipeline (see PIPELINE_DEMO.md for detailed instructions)
+python src/kafka_producer.py --ticker AAPL --file data/AAPL_stock_data.csv --sleep 0.1
+# In separate terminals:
+python src/kafka_feature_engineering.py
+python src/prediction_consumer.py
+python src/drift_monitor.py
+```
+
+For detailed walkthrough, see [PIPELINE_DEMO.md](./PIPELINE_DEMO.md).
+
+---
+
 ## 🧠 Problem Statement & Solution
 
 ### The Challenge
