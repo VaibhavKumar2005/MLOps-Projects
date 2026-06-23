@@ -78,13 +78,20 @@ def main():
             latest_row = features.tail(1).iloc[0]
             feature_payload = {
                 "symbol": symbol,
-                "timestamp": features.tail(1).index[0].isoformat(),
-                "close": float(latest_row["Close"]),
+                "timestamp": latest_row.name.isoformat(),
+
                 "MA_10": float(latest_row["MA_10"]),
                 "MA_50": float(latest_row["MA_50"]),
+
+                "SMA_20": float(latest_row["SMA_20"]),
+                "EMA_20": float(latest_row["EMA_20"]),
+
                 "Return": float(latest_row["Return"]),
+                "Volume_Change": float(latest_row["Volume_Change"]),
+
                 "Lag_1": float(latest_row["Lag_1"]),
                 "Lag_2": float(latest_row["Lag_2"]),
+
                 "Volatility": float(latest_row["Volatility"]),
             }
             producer.send(KAFKA_FEATURES_TOPIC, key=symbol, value=feature_payload)

@@ -37,8 +37,7 @@ class PredictionConsumer:
             except FileNotFoundError:
                 logger.error("❌ No model found at all. Please run: python src/train_model.py")
                 raise
-        
-        self.feature_columns = ['MA_10', 'MA_50', 'Return', 'Lag_1', 'Lag_2', 'Volatility']
+        self.feature_columns = ['MA_10', 'MA_50', 'SMA_20', 'EMA_20', 'Return', 'Volume_Change', 'Lag_1', 'Lag_2', 'Volatility']
         self.predictions = {}
     
     def build_consumer(self):
@@ -96,7 +95,10 @@ class PredictionConsumer:
                 features = {
                     'MA_10': payload.get('MA_10'),
                     'MA_50': payload.get('MA_50'),
+                    'SMA_20': payload.get('SMA_20'),
+                    'EMA_20': payload.get('EMA_20'),
                     'Return': payload.get('Return'),
+                    'Volume_Change': payload.get('Volume_Change'),
                     'Lag_1': payload.get('Lag_1'),
                     'Lag_2': payload.get('Lag_2'),
                     'Volatility': payload.get('Volatility'),

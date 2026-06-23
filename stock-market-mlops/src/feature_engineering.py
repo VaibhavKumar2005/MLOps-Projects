@@ -8,8 +8,15 @@ def create_features(df, include_target=True):
     df['MA_10'] = df['Close'].rolling(window=10).mean()
     df['MA_50'] = df['Close'].rolling(window=50).mean()
 
+    # New moving averages
+    df['SMA_20'] = df['Close'].rolling(window=20).mean()
+    df['EMA_20'] = df['Close'].ewm(span=20, adjust=False).mean()
+
     # Returns
     df['Return'] = df['Close'].pct_change()
+
+    # Volume change
+    df['Volume_Change'] = df['Volume'].pct_change()
 
     # Lag features
     df['Lag_1'] = df['Close'].shift(1)
