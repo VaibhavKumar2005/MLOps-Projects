@@ -1,35 +1,71 @@
-yfinance
+# =========================
+# Core ML
+# =========================
+numpy
 pandas
+polars
 scikit-learn
 xgboost
+
+# =========================
+# Data Ingestion
+# =========================
+yfinance
+requests
 kafka-python
 websocket-client
 
-# Data versioning and pipelines
-dvc
+# =========================
+# Workflow
+# =========================
 prefect
+dvc
 
-# Experiment tracking
+# =========================
+# Experiment Tracking
+# =========================
 mlflow
+joblib
 
-# Data validation
-great-expectations
+# =========================
+# Data Validation
+# =========================
 pandera
+great-expectations
 
-# Testing & code quality
-pytest
-black
-flake8
+# =========================
+# API
+# =========================
+fastapi
+uvicorn
+python-dotenv
 
-# Data processing
-polars
+# =========================
+# Monitoring
+# =========================
+prometheus-client
+
+# =========================
+# Database
+# =========================
 sqlalchemy
 
+# =========================
 # Visualization
+# =========================
 matplotlib
 seaborn
 plotly
 
+# =========================
+# Testing
+# =========================
+pytest
+black
+flake8
+
+# =========================
 # Notebooks
+# =========================
 jupyter
 jupyterlab
