@@ -5,3 +5,4 @@ data/*.csv
 stock-market-mlops/mlruns/
 stock-market-mlops/models/.idea/
 *.db
+.idea/
