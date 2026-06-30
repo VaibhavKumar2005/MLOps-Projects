@@ -6,9 +6,9 @@ import mlflow
 import os
 import json
 from pathlib import Path
-from feature_engineering import create_features
-from evaluate_model import evaluate_models
-from promote_model import promote_if_better
+from src.feature_engineering import create_features
+from src.evaluate_model import evaluate_models
+from src.promote_model import promote_if_better
 
 def train_model():
     """Train a linear regression model on stock data."""
