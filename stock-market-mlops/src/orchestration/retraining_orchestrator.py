@@ -1,6 +1,6 @@
 from kafka import KafkaConsumer
 import json
-from training.train_model import train_model
+from src.training.train_model import train_model
 
 consumer = KafkaConsumer(
     "drift.alerts",

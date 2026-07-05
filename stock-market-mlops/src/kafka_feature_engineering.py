@@ -79,6 +79,7 @@ def main():
             feature_payload = {
                 "symbol": symbol,
                 "timestamp": latest_row.name.isoformat(),
+                "close": float(latest_row["Close"]),
 
                 "MA_10": float(latest_row["MA_10"]),
                 "MA_50": float(latest_row["MA_50"]),

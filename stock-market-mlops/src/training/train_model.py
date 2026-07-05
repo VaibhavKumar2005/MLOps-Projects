@@ -33,6 +33,17 @@ REGISTERED_MODEL_NAME = "stock_predictor"
 TARGET_COLUMN = "Target"
 TEST_SIZE = 0.2
 RANDOM_STATE = 42
+FEATURE_COLUMNS = [
+    "MA_10",
+    "MA_50",
+    "SMA_20",
+    "EMA_20",
+    "Return",
+    "Volume_Change",
+    "Lag_1",
+    "Lag_2",
+    "Volatility",
+]
 
 
 def _load_raw_dataset(data_path: Path) -> pd.DataFrame:
@@ -136,7 +147,7 @@ def train_model():
     if TARGET_COLUMN not in featured_df.columns:
         raise KeyError(f"Expected target column '{TARGET_COLUMN}' after feature creation.")
 
-    X = featured_df.drop(columns=[TARGET_COLUMN])
+    X = featured_df[FEATURE_COLUMNS]
     y = featured_df[TARGET_COLUMN]
 
     if len(featured_df) < 10:

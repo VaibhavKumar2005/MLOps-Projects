@@ -66,6 +66,7 @@ class DriftMonitor:
         """Send drift alert to Kafka."""
         alert_payload = {
             "type": "DRIFT_ALERT",
+            "severity": "HIGH",
             "metric": metric_name,
             "value": value,
             "symbol": symbol,

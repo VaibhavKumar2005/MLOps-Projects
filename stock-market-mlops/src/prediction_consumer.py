@@ -84,43 +84,50 @@ class PredictionConsumer:
         
         try:
             for message in consumer:
-                payload = message.value
-                symbol = payload.get("symbol")
-                timestamp = payload.get("timestamp")
-                
-                if not symbol:
-                    continue
-                
-                # Extract features
-                features = {
-                    'MA_10': payload.get('MA_10'),
-                    'MA_50': payload.get('MA_50'),
-                    'SMA_20': payload.get('SMA_20'),
-                    'EMA_20': payload.get('EMA_20'),
-                    'Return': payload.get('Return'),
-                    'Volume_Change': payload.get('Volume_Change'),
-                    'Lag_1': payload.get('Lag_1'),
-                    'Lag_2': payload.get('Lag_2'),
-                    'Volatility': payload.get('Volatility'),
-                }
-                
-                # Make prediction
-                prediction = self.predict(features)
-                
-                if prediction is not None:
-                    self.predictions[symbol] = {
-                        'timestamp': timestamp,
-                        'prediction': prediction,
-                        'current_price': payload.get('close'),
-                        'features': features
+                try:
+                    payload = message.value
+                    symbol = payload.get("symbol")
+                    timestamp = payload.get("timestamp")
+
+                    if not symbol:
+                        continue
+
+                    # Extract features
+                    features = {
+                        'MA_10': payload.get('MA_10'),
+                        'MA_50': payload.get('MA_50'),
+                        'SMA_20': payload.get('SMA_20'),
+                        'EMA_20': payload.get('EMA_20'),
+                        'Return': payload.get('Return'),
+                        'Volume_Change': payload.get('Volume_Change'),
+                        'Lag_1': payload.get('Lag_1'),
+                        'Lag_2': payload.get('Lag_2'),
+                        'Volatility': payload.get('Volatility'),
                     }
-                    
-                    # Log prediction
-                    current_price = payload.get('close', 'N/A')
-                    logger.info(
-                        f"💰 {symbol:6} | Time: {timestamp:20} | "
-                        f"Current: ${current_price:8.2f} | Predicted: ${prediction:8.2f}"
+
+                    # Make prediction
+                    prediction = self.predict(features)
+
+                    if prediction is not None:
+                        self.predictions[symbol] = {
+                            'timestamp': timestamp,
+                            'prediction': prediction,
+                            'current_price': payload.get('close'),
+                            'features': features
+                        }
+
+                        # Log prediction
+                        current_price = payload.get('close', 'N/A')
+                        logger.info(
+                            f"💰 {symbol:6} | Time: {timestamp:20} | "
+                            f"Current: ${current_price:8.2f} | Predicted: ${prediction:8.2f}"
+                        )
+                except Exception as e:
+                    logger.error(
+                        f"❌ Error processing message for prediction: {e}",
+                        exc_info=True,
                     )
+                    continue
         
         except KeyboardInterrupt:
             logger.info("⏹️  Prediction consumer stopped by user")

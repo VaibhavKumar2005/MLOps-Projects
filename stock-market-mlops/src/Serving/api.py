@@ -5,7 +5,7 @@ import pandas as pd
 app = FastAPI()
 
 model = mlflow.pyfunc.load_model(
-    "models:/stock_model/Production"
+    "models:/stock_predictor/Production"
 )
 
 @app.get("/health")
