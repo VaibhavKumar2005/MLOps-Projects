@@ -5,12 +5,25 @@ from kafka import KafkaConsumer, KafkaProducer
 import numpy as np
 from datetime import datetime
 
-from config import (
+from src.config import (
     KAFKA_BOOTSTRAP_SERVERS,
     KAFKA_CLIENT_ID,
     KAFKA_FEATURES_TOPIC,
     KAFKA_DRIFT_ALERTS_TOPIC,
 )
+
+
+def detect_drift(reference_values, current_values):
+    """Return a simple normalized mean-shift drift score in [0, +inf)."""
+    ref = np.asarray(reference_values, dtype=float)
+    cur = np.asarray(current_values, dtype=float)
+
+    if ref.size == 0 or cur.size == 0:
+        return 0.0
+
+    baseline = float(np.std(ref))
+    shift = abs(float(np.mean(cur)) - float(np.mean(ref)))
+    return shift / (baseline + 1e-9)
 
 # Configure logging
 logging.basicConfig(
