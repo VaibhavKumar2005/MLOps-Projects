@@ -73,9 +73,10 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KAFKA_CLIENT_ID: stock-market-producer
       KAFKA_RAW_TOPIC: stock.raw
-      TWELVEDATA_API_KEY: ${TWELVEDATA_API_KEY:-demo}
+      TWELVEDATA_API_KEY: ${TWELVEDATA_API_KEY:?set TWELVEDATA_API_KEY in .env to stream live data}
+      TWELVEDATA_SYMBOLS: ${TWELVEDATA_SYMBOLS:-AAPL,MSFT,TSLA}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
-    command: python -m src.kafka_producer
+    command: python -m src.twelvedata_producer --symbols ${TWELVEDATA_SYMBOLS:-AAPL,MSFT,TSLA}
     networks:
       - mlops-network
     restart: unless-stopped

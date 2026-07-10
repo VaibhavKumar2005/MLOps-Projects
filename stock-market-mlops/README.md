@@ -109,16 +109,15 @@ cd stock-market-mlops
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Start Kafka infrastructure
-docker compose up -d
+# 3. Configure your Twelve Data key in .env
+cp .env.example .env
+# edit TWELVEDATA_API_KEY in .env
 
-# 4. Run the pipeline (see PIPELINE_DEMO.md for detailed instructions)
-python src/kafka_producer.py --ticker AAPL --file data/AAPL_stock_data.csv --sleep 0.1
-# In separate terminals:
-python src/kafka_feature_engineering.py
-python src/prediction_consumer.py
-python src/drift_monitor.py
+# 4. Start Kafka, MLflow, and the live stream pipeline
+docker compose up -d
 ```
+
+The producer service now uses the Twelve Data WebSocket feed and publishes live market ticks to the `stock.raw` Kafka topic, which kicks off feature engineering, prediction, and drift monitoring automatically.
 
 For detailed walkthrough, see [PIPELINE_DEMO.md](./PIPELINE_DEMO.md).
 

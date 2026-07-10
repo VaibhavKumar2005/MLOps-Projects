@@ -75,7 +75,7 @@ def main():
     )
     parser.add_argument(
         "--symbols",
-        default="AAPL,MSFT,TSLA",
+        default=os.getenv("TWELVEDATA_SYMBOLS", "AAPL,MSFT,TSLA"),
         help="Comma-separated symbols (e.g., AAPL,MSFT,TSLA).",
     )
     args = parser.parse_args()
@@ -84,10 +84,11 @@ def main():
     if not api_key:
         raise RuntimeError(f"Set {TWELVEDATA_API_KEY_ENV} environment variable.")
     
-    symbols = [s.strip().upper() for s in args.symbols.split(",") if s]
+    symbols = [s.strip().upper() for s in args.symbols.split(",") if s.strip()]
     if not symbols:
         raise ValueError("Provide at least one symbol.")
     
+    print(f"Streaming live data for: {', '.join(symbols)}")
     run_stream(symbols, api_key)
 
 
