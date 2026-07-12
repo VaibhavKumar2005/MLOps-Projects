@@ -439,15 +439,17 @@ This sends OHLCV data to the `stock.raw` Kafka topic.
 This uses Twelve Data's free websocket feed. It publishes price ticks to `stock.raw` and maps the price into OHLCV fields (open/high/low/close all equal to price, volume set to 0).
 
 Set your API key:
+1. Copy the example environment file and set your Twelve Data key:
 
 ```bash
-setx TWELVEDATA_API_KEY "YOUR_API_KEY"
+cp .env.example .env
+# Edit .env and set TWELVEDATA_API_KEY=YOUR_API_KEY
 ```
 
-For the current PowerShell session:
+2. Or export the key in your shell (temporary for the session):
 
 ```bash
-$env:TWELVEDATA_API_KEY="YOUR_API_KEY"
+export TWELVEDATA_API_KEY="YOUR_API_KEY"
 ```
 
 Then run the producer:

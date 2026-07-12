@@ -2,6 +2,15 @@
 
 A portfolio of machine learning and MLOps projects, showcasing my journey in building production-level systems and learning best practices in ML engineering.
 
+## Table of contents
+
+- Overview
+- Projects
+- Getting Started
+- Tech Stack
+- Repository Structure
+- Contact
+
 ## 🎯 Purpose
 
 This repository contains multiple projects focused on:
@@ -120,3 +129,4 @@ Part of my portfolio as a student exploring MLOps and AI Engineering.
 ---
 
 **Last Updated:** April 2026
+**Last Updated:** July 2026
