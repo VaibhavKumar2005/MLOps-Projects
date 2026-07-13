@@ -8,13 +8,23 @@ from pathlib import Path
 import joblib
 import mlflow
 import mlflow.sklearn
-import mlflow.xgboost
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
-from xgboost import XGBRegressor
+
+try:
+    import mlflow.xgboost
+except ImportError:  # pragma: no cover - optional dependency
+    mlflow_xgboost = None
+else:
+    mlflow_xgboost = mlflow.xgboost
+
+try:
+    from xgboost import XGBRegressor
+except ImportError:  # pragma: no cover - optional dependency
+    XGBRegressor = None
 
 from src.feature_engineering import create_features
 
@@ -59,7 +69,7 @@ def _load_raw_dataset(data_path: Path) -> pd.DataFrame:
 def _build_models() -> dict[str, tuple[object, dict[str, object]]]:
     """Return the candidate models and the parameters to log for each one."""
 
-    return {
+    models = {
         "linear_regression": (
             LinearRegression(),
             {},
@@ -82,7 +92,10 @@ def _build_models() -> dict[str, tuple[object, dict[str, object]]]:
                 "n_jobs": -1,
             },
         ),
-        "xgboost": (
+    }
+
+    if XGBRegressor is not None:
+        models["xgboost"] = (
             XGBRegressor(
                 n_estimators=300,
                 max_depth=5,
@@ -106,8 +119,9 @@ def _build_models() -> dict[str, tuple[object, dict[str, object]]]:
                 "objective": "reg:squarederror",
                 "eval_metric": "rmse",
             },
-        ),
-    }
+        )
+
+    return models
 
 
 def _evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series) -> dict[str, float]:
@@ -128,8 +142,8 @@ def _feature_importance_artifact(model, feature_names: list[str]) -> dict[str, f
 
 
 def _log_model_artifact(model_name: str, model) -> None:
-    if model_name == "xgboost":
-        mlflow.xgboost.log_model(model, artifact_path="model")
+    if model_name == "xgboost" and mlflow_xgboost is not None:
+        mlflow_xgboost.log_model(model, artifact_path="model")
     else:
         mlflow.sklearn.log_model(model, artifact_path="model")
 
@@ -256,7 +270,7 @@ def train_model():
             float(best_row["r2"]),
         )
 
-        if best_row["model_name"] == "xgboost":
+        if best_row["model_name"] == "xgboost" and mlflow_xgboost is not None:
             mlflow.xgboost.log_model(
                 best_model,
                 artifact_path="best_model",

@@ -23,8 +23,9 @@ help:
 setup:
 	@echo "Setting up development environment..."
 	python -m venv venv
-	./venv/Scripts/activate && pip install -r requirements.txt
-	cp .env.example .env
+	./venv/bin/python -m pip install --upgrade pip
+	./venv/bin/python -m pip install -r requirements.txt
+	@if [ -f .env.example ]; then cp .env.example .env; fi
 	@echo "Setup complete! Run 'source venv/bin/activate' (or venv\Scripts\activate on Windows)"
 
 install:

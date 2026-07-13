@@ -35,6 +35,7 @@ stages:
     cmd: python -m src.train_model
     deps:
       - src/train_model.py
+      - src/training/train_model.py
       - src/config.py
       - data/features
     outs:
@@ -52,6 +53,7 @@ stages:
     cmd: python -m src.drift_monitor
     deps:
       - src/drift_monitor.py
+      - src/Monitoring/drift_monitor.py
       - src/config.py
       - models/model.pkl
     metrics:
