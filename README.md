@@ -1,132 +1,71 @@
-# MLOps Portfolio
+# MLOps Projects
 
-A portfolio of machine learning and MLOps projects, showcasing my journey in building production-level systems and learning best practices in ML engineering.
+This repository collects practical MLOps experiments and production-oriented ML engineering examples. The current flagship project is an event-driven stock market pipeline that demonstrates streaming data ingestion, feature engineering, model inference, monitoring, and reproducible experimentation.
 
-## Table of contents
+## What is included
 
-- Overview
-- Projects
-- Getting Started
-- Tech Stack
-- Repository Structure
-- Contact
+- A streaming ML workflow built around Kafka, Docker Compose, and MLflow
+- A modular Python project structure for ingestion, transformation, prediction, and drift monitoring
+- Reproducible data and experiment tracking using DVC and MLflow
+- Documentation for setup, local execution, and deployment
 
-## 🎯 Purpose
+## Repository layout
 
-This repository contains multiple projects focused on:
+- [stock-market-mlops/](stock-market-mlops/) – the main streaming pipeline project
+- [SETUP.md](SETUP.md) – environment setup instructions
+- [DEPLOYMENT.md](DEPLOYMENT.md) – local and container deployment guidance
+- [API.md](API.md) – API-related notes and reference material
 
-- **Production-grade ML systems** — not just models, but complete pipelines with data ingestion, processing, and validation
-- **MLOps practices** — automation, CI/CD, monitoring, and reproducibility  
-- **Real-world engineering** — version control, testing, documentation, and deployment strategies
+## Quick start
 
-## 📚 Projects
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/VaibhavKumar2005/MLOps-Projects.git
+   cd MLOps-Projects
+   ```
 
-### 1. [Stock Market MLOps Pipeline](./stock-market-mlops/)  
-**Status:** In Progress  
+2. Create and activate a Python environment:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
+   ```
 
-An end-to-end data pipeline for financial data processing:
+3. Install the project dependencies:
+   ```bash
+   cd stock-market-mlops
+   pip install -e ".[dev]"
+   ```
 
-- Real-time-like stock data ingestion using yFinance
-- Multi-source data management (AAPL, MSFT, TSLA, etc.)
-- Data validation and feature engineering
-- Focus on scalability and reproducibility
+4. Configure the environment file:
+   ```bash
+   cp .env.example .env
+   ```
+   Update the values in [.env.example](stock-market-mlops/.env.example) and the copied [.env](stock-market-mlops/.env) file, especially the Twelve Data API key.
 
-**Tech Stack:** Python, Pandas, yFinance, Git  
-**What I'm Learning:** Data pipelines, data quality, version control best practices
+5. Start the services:
+   ```bash
+   docker compose up -d
+   ```
 
----
+6. Watch the logs or stop the stack when needed:
+   ```bash
+   docker compose ps
+   docker compose logs -f
+   docker compose down
+   ```
 
-### 2. Machine Learning System (Planned)
+## Documentation
 
-A production ML system covering model training, evaluation, and inference with focus on:
+- See [SETUP.md](SETUP.md) for local environment preparation.
+- See [DEPLOYMENT.md](DEPLOYMENT.md) for Docker, MLflow, and operational guidance.
+- See [stock-market-mlops/README.md](stock-market-mlops/README.md) for the detailed project overview.
 
-- Experiment tracking
-- Model versioning
-- Hyperparameter tuning
-- Cross-validation and evaluation metrics
+## Current focus
 
----
+- Build reliable ML pipelines with clear interfaces and data contracts
+- Improve observability and monitoring for drift and model health
+- Make deployment workflows repeatable and documentation-first
 
-### 3. Kubernetes & Kubeflow (Planned)
+## Status
 
-Container orchestration and workflow management:
-
-- Containerizing ML pipelines
-- Orchestrating distributed workflows
-- Scaling inference services
-- Managing ML experiments at scale
-
----
-
-## 🛠️ Tech Stack (Current)
-
-- **Languages:** Python
-- **Data Processing:** Pandas, NumPy, DVC (Data Version Control)
-- **ML/Modeling:** (To be integrated)
-- **DevOps:** Git, Docker, GitHub Actions (CI/CD)
-- **Cloud:**GCP (planned)
-
-## 🚀 Getting Started
-
-### Quick Start (Stock Market Pipeline - Working ✅)
-
-```bash
-cd stock-market-mlops
-pip install -r requirements.txt
-docker compose up -d
-python src/kafka_producer.py --ticker AAPL --file data/AAPL_stock_data.csv --sleep 0.1
-# Open 3 more terminals and run:
-python src/kafka_feature_engineering.py
-python src/prediction_consumer.py
-python src/drift_monitor.py
-```
-
-See [stock-market-mlops/PIPELINE_DEMO.md](./stock-market-mlops/PIPELINE_DEMO.md) for full walkthrough.
-
-### Detailed Setup
-
-Each project has its own detailed README with setup instructions:
-
-```bash
-cd stock-market-mlops
-cat README.md
-```
-
-## 📖 Repository Structure
-
-```text
-MLOps-Projects/
-├── stock-market-mlops/     # Financial data pipeline
-│   ├── data/               # Raw and processed data
-│   ├── src/                # Source code
-│   ├── notebooks/          # Experiments (optional)
-│   ├── .dvc/               # DVC configuration
-│   ├── dvc.yaml            # DVC pipeline definition
-│   └── README.md           # Project documentation
-├── README.md               # This file
-└── .gitignore
-```
-
-## 🎓 Learning Goals
-
-- [ ] Build complete, documented ML pipelines
-- [ ] Implement data validation and quality checks
-- [ ] Containerize ML applications
-- [ ] Set up CI/CD workflows
-- [ ] Deploy models to production environments
-- [ ] Monitor model performance
-
-## 📝 Notes
-
-- Each project is self-contained but follows consistent practices
-- Focus is on engineering best practices, not just accuracy metrics
-- All projects are works in progress and will be continuously improved
-
-## 📧 Contact
-
-Part of my portfolio as a student exploring MLOps and AI Engineering.
-
----
-
-**Last Updated:** April 2026
-**Last Updated:** July 2026
+The repository is actively evolving and is intended as a practical portfolio project for MLOps engineering.

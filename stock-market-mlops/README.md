@@ -1,253 +1,76 @@
-# 📈 Event-Driven Streaming ML Pipeline for Financial Market Analysis
+# Event-Driven Streaming ML Pipeline for Financial Market Analysis
 
-## 🚀 Overview
+## Overview
 
-A **production-grade event-driven streaming ML pipeline** for real-time financial data analysis. This system demonstrates how modern ML systems process continuous data streams: ingesting market data via Apache Kafka, engineering features in real-time, making predictions, and monitoring data drift—all without batch jobs.
+This project demonstrates an event-driven ML workflow for financial market analysis. It combines Kafka-based messaging, stream processing, model inference, drift monitoring, and experiment tracking in a single local-first environment.
 
-```
-Market Data Stream → Kafka Events → Real-Time Feature Engineering → ML Inference → Drift Monitoring
-```
+The pipeline follows a simple path:
 
-**This is production-grade architecture.** Every component handles real-time data: no batch processing, no delayed training, no stale predictions.
-
----
-
-## �️ System Architecture
-
-```mermaid
-graph LR
-    A["📊 TwelveData<br/>WebSocket"]
-    B["📁 yFinance<br/>CSV Data"]
-    C["🔌 Kafka<br/>stock.raw"]
-    
-    D["⚙️ Feature<br/>Engineering"]
-    E["🔌 Kafka<br/>stock.features"]
-    
-    F["🤖 Inference<br/>Service"]
-    G["📈 Predictions"]
-    
-    H["📉 Drift<br/>Monitor"]
-    I["🔌 Kafka<br/>drift.alerts"]
-    
-    J["🏛️ MLflow<br/>Registry"]
-    
-    A -->|raw events| C
-    B -->|raw events| C
-    C --> D
-    D --> E
-    E --> F
-    E --> H
-    F --> G
-    J -->|load model| F
-    H -->|send alerts| I
-    
-    style C fill:#ff9999
-    style E fill:#ff9999
-    style I fill:#ff9999
-    style J fill:#99ccff
-    style F fill:#99ff99
+```text
+Market data → Kafka events → Feature engineering → Prediction → Drift monitoring
 ```
 
----
+## Key capabilities
 
-## �🎯 Key Capabilities
+- Real-time or near-real-time ingestion of market data
+- Kafka topics for raw events, engineered features, and alerts
+- Stream processing components for feature engineering and prediction
+- Drift monitoring with alert generation
+- Experiment tracking with MLflow and data versioning with DVC
 
-| Capability | Description |
-| --- | --- |
-| **Real-Time Data Streaming** | Apache Kafka ingests OHLCV market data continuously |
-| **Event-Driven Computation** | Features computed on-demand as raw events arrive |
-| **Live Predictions** | ML models produce predictions immediately from features |
-| **Drift Detection** | Automatic monitoring for distribution shifts in live data |
-| **Model Versioning** | MLflow tracks all experiments and models |
-| **Data Versioning** | DVC manages historical datasets and reproducibility |
-| **Container Orchestration** | Docker Compose ensures consistent local & production environments |
-| **CI/CD Pipeline** | GitHub Actions automates testing, linting, and Docker builds |
-| **Kubernetes Ready** | Helm charts for deploying to K8s clusters (MLflow server) |
+## Prerequisites
 
----
+- Python 3.11+
+- Docker and Docker Compose
+- Git
+- A valid Twelve Data API key for live streaming
 
-## 🚨 Monitoring & Alerting
-
-**Drift Detection**: The system continuously monitors feature distributions against training baselines.
-
-When drift is detected (z-score > threshold), the system:
-1. Publishes a structured alert to the `drift.alerts` Kafka topic
-2. Includes the detected metric, z-score, and timestamp
-3. Enables downstream systems (retraining orchestrators) to respond automatically
-
-**Example Alert**:
-
-```json
-{
-  "type": "DRIFT_ALERT",
-  "symbol": "AAPL",
-  "metric": "volatility",
-  "z_score": 3.45,
-  "value": 0.082,
-  "threshold": 3.0,
-  "timestamp": "2026-06-05T14:32:15Z"
-}
-```
-
-This enables a **true feedback loop**: `Detect → Alert → Trigger → Retrain → Evaluate → Promote`
-
----
-
-## 📋 Prerequisites
-
-- **Python 3.8+**
-- **Docker & Docker Compose** (for Kafka + Zookeeper)
-- **pip** or **conda** for Python package management
-- **Git** for version control
-
-## 🚀 Quick Start
+## Quick start
 
 ```bash
-# 1. Clone and navigate
 cd stock-market-mlops
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Configure your Twelve Data key in .env
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
 cp .env.example .env
-# edit TWELVEDATA_API_KEY in .env
-
-# 4. Start Kafka, MLflow, and the live stream pipeline
+# Edit .env and set TWELVEDATA_API_KEY
 docker compose up -d
 ```
 
-The producer service now uses the Twelve Data WebSocket feed and publishes live market ticks to the `stock.raw` Kafka topic, which kicks off feature engineering, prediction, and drift monitoring automatically.
+The stack starts Kafka, Zookeeper, MLflow, and the application services. Use the following commands for routine operations:
 
-For detailed walkthrough, see [PIPELINE_DEMO.md](./PIPELINE_DEMO.md).
-
----
-
-## 🧠 Problem Statement & Solution
-
-### The Challenge
-
-- Stock market data arrives **continuously** with **no fixed schedule**
-- Model distributions **shift constantly** (market regime changes)
-- Traditional batch ML is **too slow**: by the time you retrain, the model is stale
-- **Production ML requires sub-second latency** for predictions
-
-### The Solution: Event-Driven Architecture
-
-- Each market price update triggers a chain of computations
-- Features are engineered on incoming events (not batched)
-- Predictions happen **immediately** as features become available
-- Drift detection runs **continuously** to alert on model degradation
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology | Purpose |
-| --- | --- | --- |
-| **Message Streaming** | Apache Kafka | Event distribution & decoupling |
-| **Stream Processing** | Kafka Consumers (Python) | Real-time transformation |
-| **ML Framework** | scikit-learn | Model training & inference |
-| **ML Tracking** | MLflow | Experiment tracking, model registry |
-| **Data Versioning** | DVC + Git | Dataset reproducibility |
-| **Orchestration** | Docker Compose | Local & CI/CD consistency |
-| **Language** | Python 3.9+ | All components |
-
----
-
-## � Event Schemas
-
-Event-driven systems require explicit contracts between producers and consumers. This project maintains **JSON Schema** definitions for all Kafka topics:
-
-```
-schemas/
-├── stock_raw.json          # Raw OHLCV events (yfinance / WebSocket)
-├── stock_features.json     # Engineered features (MA, Volatility, Lags)
-└── drift_alert.json        # Data drift detection alerts
+```bash
+docker compose ps
+docker compose logs -f
+docker compose down
 ```
 
-**Why this matters**: As producers and consumers evolve independently, schemas ensure compatibility and enable schema validation/evolution at the message level.
+## Project structure
 
----
-
-## �📂 Project Structure
-
-```
+```text
 stock-market-mlops/
-│
-├── schemas/                           # Kafka topic event schemas
-│   ├── stock_raw.json                # Raw OHLCV events
-│   ├── stock_features.json           # Engineered features
-│   └── drift_alert.json              # Drift alerts
-│
-├── helm/                              # Kubernetes Helm charts
-│   └── mlflow/                       # MLflow deployment chart
-│
-├── .github/workflows/
-│   └── main.yml                       # CI/CD pipeline (lint, test, build)
-│
-├── data/                              
-│   ├── AAPL_stock_data.csv           # Apple price history (DVC-versioned)
-│   ├── MSFT_stock_data.csv           # Microsoft price history
-│   └── TSLA_stock_data.csv           # Tesla price history
-│
-├── models/                            
-│   └── model.pkl                      # Trained LinearRegression model
-│
-├── mlruns/                            # MLflow experiment tracking
-│   └── (auto-generated by MLflow)
-│
-├── src/
-│   ├── config.py                      # Kafka & MLflow configs
-│   ├── data_ingestion.py              # yFinance data fetcher
-│   ├── feature_engineering.py         # Feature computation logic
-│   ├── kafka_producer.py              # Raw data → Kafka streamer
-│   ├── twelvedata_producer.py         # Real-time prices → Kafka streamer
-│   ├── kafka_feature_engineering.py   # Raw events → Feature computation
-│   ├── train_model.py                 # Model training w/ MLflow Registry
-│   ├── prediction_consumer.py         # Feature events → Predictions
-│   └── drift_monitor.py               # Live drift detection & alerts
-│
-├── tests/
-│   └── test_config.py                 # Configuration tests
-│
-├── docker-compose.yml                 # Kafka + Zookeeper services
-├── Dockerfile                         # Container image definition
-├── requirements.txt                   # Python dependencies
-├── pyproject.toml                     # Project metadata & dependencies
-├── PIPELINE_DEMO.md                   # Step-by-step execution guide
-└── README.md                          # This file
+├── src/                  # Streaming producers, consumers, and model logic
+├── tests/                # Test suite
+├── schemas/              # Kafka event schemas
+├── helm/                 # Helm charts for deployment helpers
+├── data/                 # Input data and generated artifacts
+├── models/               # Model artifacts
+├── mlruns/               # MLflow tracking data
+├── docker-compose.yml    # Local stack definition
+├── Dockerfile            # Container image
+├── pyproject.toml        # Python project metadata
+└── README.md             # Project documentation
 ```
 
----
+## Development notes
 
-## 📡 Architecture: Event-Driven ML Pipeline
+- Run tests with `pytest tests/`.
+- Use `make logs` or `docker compose logs -f` to inspect service behavior.
+- Review [../SETUP.md](../SETUP.md) and [../DEPLOYMENT.md](../DEPLOYMENT.md) for detailed operational guidance.
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    EVENT-DRIVEN STREAMING ML SYSTEM                     │
-└─────────────────────────────────────────────────────────────────────────┘
+## Status
 
-┌──────────────────────────────────────────────────────────────────────────┐
-│ TIER 1: DATA INGESTION (Stream Source)                                   │
-├──────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  yfinance / Real-time API                                               │
-│         │                                                               │
-│         ↓                                                               │
-│  kafka_producer.py                                                     │
-│  ├─ Reads historical CSV files                                         │
-│  ├─ Converts to streaming events                                       │
-│  └─ Publishes to stock.raw topic                                       │
-│         │                                                               │
-│         ↓                                                               │
-│  ┌─────────────────────────────┐                                       │
-│  │  Kafka Topic: stock.raw     │                                       │
-│  │  (Raw OHLCV events)         │                                       │
-│  │  {symbol, timestamp, O, H,  │                                       │
-│  │   L, C, V}                  │                                       │
-│  └─────────────────────────────┘                                       │
-│                                                                          │
+This is an evolving portfolio project focused on practical MLOps patterns rather than a polished production SaaS product.
 └──────────────────────────────────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────────────────────────────────┐
