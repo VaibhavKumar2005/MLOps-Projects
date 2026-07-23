@@ -4,11 +4,8 @@ stages:
     deps:
       - src/data_ingestion.py
       - src/config.py
-      - data/AAPL_stock_data.csv
-      - data/MSFT_stock_data.csv
-      - data/TSLA_stock_data.csv
     outs:
-      - data/processed:
+      - data/live:
           cache: true
     metrics:
       - metrics/data_ingestion.json:
@@ -23,7 +20,7 @@ stages:
     deps:
       - src/feature_engineering.py
       - src/config.py
-      - data/processed
+      - data/live
     outs:
       - data/features:
           cache: true

@@ -12,9 +12,9 @@ logging.basicConfig(
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = PROJECT_ROOT / "data"
+LIVE_DATA_DIR = PROJECT_ROOT / "data" / "live"
 
-DATA_DIR.mkdir(exist_ok=True)
+LIVE_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 TICKERS = [
     "AAPL",
@@ -23,25 +23,21 @@ TICKERS = [
 ]
 
 
-def download_stock_data(
+def collect_live_stock_data(
         tickers=TICKERS,
-        period="2y",
-        interval="1d",
+        period="5d",
+        interval="15m",
 ):
-    """
-    Download historical stock data from Yahoo Finance.
+    """Collect a fresh live market snapshot from Yahoo Finance.
 
-    Args:
-        tickers (list): List of ticker symbols.
-        period (str): Time period (1y, 2y, 5y, max, etc.).
-        interval (str): Data interval (1d, 1h, etc.).
+    The pipeline uses this runtime snapshot instead of committed historical CSVs.
     """
 
-    downloaded_files = []
+    collected_files = []
 
     for ticker in tickers:
         try:
-            logging.info(f"Downloading {ticker}...")
+            logging.info("Collecting live snapshot for %s...", ticker)
 
             df = yf.download(
                 ticker,
@@ -52,29 +48,26 @@ def download_stock_data(
             )
 
             if df.empty:
-                logging.warning(f"No data returned for {ticker}")
+                logging.warning("No data returned for %s", ticker)
                 continue
 
-            # Validate downloaded data
             if not validate_stock_data(df):
-                logging.error(f"Validation failed for {ticker}")
+                logging.error("Validation failed for %s", ticker)
                 continue
 
-            output_file = DATA_DIR / f"{ticker}_stock_data.csv"
-
+            output_file = LIVE_DATA_DIR / f"{ticker}_live_data.csv"
             df.to_csv(output_file)
 
-            downloaded_files.append(output_file)
-
-            logging.info(f"Saved {ticker} -> {output_file}")
+            collected_files.append(output_file)
+            logging.info("Saved live snapshot for %s -> %s", ticker, output_file)
 
         except Exception as e:
-            logging.exception(f"Failed downloading {ticker}: {e}")
+            logging.exception("Failed collecting live data for %s: %s", ticker, e)
 
-    logging.info(f"Downloaded {len(downloaded_files)} dataset(s).")
+    logging.info("Collected %s live dataset(s).", len(collected_files))
 
-    return downloaded_files
+    return collected_files
 
 
 if __name__ == "__main__":
-    download_stock_data()
+    collect_live_stock_data()

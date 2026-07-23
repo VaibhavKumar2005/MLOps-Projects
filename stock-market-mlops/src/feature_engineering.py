@@ -1,4 +1,11 @@
+from pathlib import Path
+
 import pandas as pd
+
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+LIVE_DATA_DIR = PROJECT_ROOT / "data" / "live"
+FEATURES_DIR = PROJECT_ROOT / "data" / "features"
 
 
 def create_features(df, include_target=True):
@@ -35,10 +42,22 @@ def create_features(df, include_target=True):
     return df
 
 
+def build_feature_files(source_dir: Path = LIVE_DATA_DIR, target_dir: Path = FEATURES_DIR):
+    """Create feature snapshots from the latest live raw data files."""
+
+    target_dir.mkdir(parents=True, exist_ok=True)
+    generated_files = []
+
+    for source_file in sorted(source_dir.glob("*_live_data.csv")):
+        df = pd.read_csv(source_file, index_col=0, parse_dates=True)
+        df_features = create_features(df)
+        output_file = target_dir / source_file.name.replace("_live_data.csv", "_features.csv")
+        df_features.to_csv(output_file)
+        generated_files.append(output_file)
+
+    return generated_files
+
+
 if __name__ == "__main__":
-    df = pd.read_csv("data/AAPL_stock_data.csv", index_col=0, parse_dates=True)
-
-    df_features = create_features(df)
-
-    print(df_features.head())
-    print(df_features.columns)
+    files = build_feature_files()
+    print(f"Generated {len(files)} feature file(s).")

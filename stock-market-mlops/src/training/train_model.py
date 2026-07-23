@@ -26,9 +26,6 @@ try:
 except ImportError:  # pragma: no cover - optional dependency
     XGBRegressor = None
 
-from src.feature_engineering import create_features
-
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -36,7 +33,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parents[2]
-DATA_PATH = BASE_DIR / "data" / "AAPL_stock_data.csv"
+FEATURES_PATH = BASE_DIR / "data" / "features" / "AAPL_features.csv"
+RAW_LIVE_PATH = BASE_DIR / "data" / "live" / "AAPL_live_data.csv"
 MODELS_DIR = BASE_DIR / "models"
 EXPERIMENT_NAME = "stock-market-experiment"
 REGISTERED_MODEL_NAME = "stock_predictor"
@@ -56,14 +54,22 @@ FEATURE_COLUMNS = [
 ]
 
 
-def _load_raw_dataset(data_path: Path) -> pd.DataFrame:
-    """Load the historical stock CSV using the repo's current file layout."""
+def _load_training_dataset(feature_path: Path, raw_path: Path) -> pd.DataFrame:
+    """Load the latest live feature snapshot, or build it from live raw data."""
 
-    if not data_path.exists():
-        raise FileNotFoundError(f"Dataset not found: {data_path}")
+    if feature_path.exists():
+        logger.info("Loading feature dataset from %s", feature_path)
+        return pd.read_csv(feature_path, index_col=0, parse_dates=True)
 
-    logger.info("Loading dataset from %s", data_path)
-    return pd.read_csv(data_path, header=0, index_col=0, skiprows=[1, 2], parse_dates=True)
+    if raw_path.exists():
+        logger.info("Feature dataset missing; building from raw live data at %s", raw_path)
+        raw_df = pd.read_csv(raw_path, index_col=0, parse_dates=True)
+
+        from src.feature_engineering import create_features
+
+        return create_features(raw_df)
+
+    raise FileNotFoundError(f"Dataset not found: {feature_path} or {raw_path}")
 
 
 def _build_models() -> dict[str, tuple[object, dict[str, object]]]:
@@ -155,8 +161,7 @@ def train_model():
 
     mlflow.set_experiment(EXPERIMENT_NAME)
 
-    raw_df = _load_raw_dataset(DATA_PATH)
-    featured_df = create_features(raw_df)
+    featured_df = _load_training_dataset(FEATURES_PATH, RAW_LIVE_PATH)
 
     if TARGET_COLUMN not in featured_df.columns:
         raise KeyError(f"Expected target column '{TARGET_COLUMN}' after feature creation.")
@@ -193,7 +198,7 @@ def train_model():
                 "train_rows": len(X_train),
                 "test_rows": len(X_test),
                 "feature_count": X.shape[1],
-                "source_rows": len(raw_df),
+                "source_rows": len(featured_df),
                 "featured_rows": len(featured_df),
             }
         )

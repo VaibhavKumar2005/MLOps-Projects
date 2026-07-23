@@ -1,10 +1,12 @@
 import logging
+from typing import Final
 
+import numpy as np
 import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-REQUIRED_COLUMNS = [
+REQUIRED_COLUMNS: Final[list[str]] = [
     "Open",
     "High",
     "Low",
@@ -12,85 +14,110 @@ REQUIRED_COLUMNS = [
     "Volume",
 ]
 
+PRICE_COLUMNS: Final[list[str]] = [
+    "Open",
+    "High",
+    "Low",
+    "Close",
+]
 
-def validate_stock_data(df: pd.DataFrame) -> bool:
-    """
-    Validate downloaded stock data.
-    Returns True if valid, False otherwise.
-    """
 
-    # Dataset exists
+class DataValidationError(Exception):
+    """Raised when stock data validation fails."""
+
+
+def _validate_dataset(df: pd.DataFrame) -> None:
     if df.empty:
-        logger.error("Dataset is empty.")
-        return False
+        raise DataValidationError("Dataset is empty.")
 
-    # Required columns
+    if not isinstance(df.index, pd.DatetimeIndex):
+        raise DataValidationError("Index must be DatetimeIndex.")
+
+    if not df.index.is_monotonic_increasing:
+        raise DataValidationError("Index is not sorted.")
+
+    if df.index.has_duplicates:
+        raise DataValidationError("Duplicate timestamps detected.")
+
+    if df.duplicated().any():
+        raise DataValidationError("Duplicate rows detected.")
+
+
+def _validate_columns(df: pd.DataFrame) -> None:
     missing = [
-        col
-        for col in REQUIRED_COLUMNS
-        if col not in df.columns
+        c for c in REQUIRED_COLUMNS
+        if c not in df.columns
     ]
 
     if missing:
-        logger.error(f"Missing columns: {missing}")
-        return False
+        raise DataValidationError(
+            f"Missing columns: {missing}"
+        )
 
-    # Duplicate timestamps
-    if df.index.has_duplicates:
-        logger.error("Duplicate timestamps detected.")
-        return False
 
-    # Missing values
+def _validate_missing_values(df: pd.DataFrame) -> None:
     if df[REQUIRED_COLUMNS].isnull().any().any():
-        logger.error("Missing values detected.")
-        return False
+        raise DataValidationError(
+            "Missing values detected."
+        )
 
-    # Numeric checks
-    if (df["Open"] <= 0).any():
-        logger.error("Invalid Open prices.")
-        return False
 
-    if (df["High"] <= 0).any():
-        logger.error("Invalid High prices.")
-        return False
+def _validate_numeric(df: pd.DataFrame) -> None:
+    if np.isinf(df[REQUIRED_COLUMNS].to_numpy()).any():
+        raise DataValidationError(
+            "Infinite values detected."
+        )
 
-    if (df["Low"] <= 0).any():
-        logger.error("Invalid Low prices.")
-        return False
-
-    if (df["Close"] <= 0).any():
-        logger.error("Invalid Close prices.")
-        return False
+    for col in PRICE_COLUMNS:
+        if (df[col] <= 0).any():
+            raise DataValidationError(
+                f"{col} contains invalid prices."
+            )
 
     if (df["Volume"] < 0).any():
-        logger.error("Negative volume detected.")
-        return False
+        raise DataValidationError(
+            "Negative volume detected."
+        )
 
-    # Logical OHLC relationships
-    if (df["High"] < df["Low"]).any():
-        logger.error("High price lower than Low price.")
-        return False
 
-    if (df["High"] < df["Open"]).any():
-        logger.error("High lower than Open.")
-        return False
+def _validate_ohlc(df: pd.DataFrame) -> None:
+    checks = [
+        (df["High"] >= df["Low"], "High < Low"),
+        (df["High"] >= df["Open"], "High < Open"),
+        (df["High"] >= df["Close"], "High < Close"),
+        (df["Low"] <= df["Open"], "Low > Open"),
+        (df["Low"] <= df["Close"], "Low > Close"),
+    ]
 
-    if (df["High"] < df["Close"]).any():
-        logger.error("High lower than Close.")
-        return False
+    for passed, message in checks:
+        if not passed.all():
+            raise DataValidationError(message)
 
-    if (df["Low"] > df["Open"]).any():
-        logger.error("Low higher than Open.")
-        return False
 
-    if (df["Low"] > df["Close"]).any():
-        logger.error("Low higher than Close.")
-        return False
+def validate_stock_data(
+    df: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Validate stock market OHLCV dataset.
 
-    # Sorted timestamps
-    if not df.index.is_monotonic_increasing:
-        logger.error("Dates are not sorted.")
-        return False
+    Returns
+    -------
+    pd.DataFrame
+        Validated dataframe.
 
-    logger.info("Stock data validation passed.")
-    return True
+    Raises
+    ------
+    DataValidationError
+    """
+
+    logger.info("Starting stock data validation...")
+
+    _validate_dataset(df)
+    _validate_columns(df)
+    _validate_missing_values(df)
+    _validate_numeric(df)
+    _validate_ohlc(df)
+
+    logger.info("Validation successful.")
+
+    return df
