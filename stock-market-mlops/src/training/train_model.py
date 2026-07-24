@@ -191,7 +191,9 @@ def train_model():
     with mlflow.start_run(run_name="train_model"):
         mlflow.log_params(
             {
-                "dataset_path": str(DATA_PATH),
+                "dataset_path": str(
+                    FEATURES_PATH if FEATURES_PATH.exists() else RAW_LIVE_PATH
+                ),
                 "target_column": TARGET_COLUMN,
                 "test_size": TEST_SIZE,
                 "random_state": RANDOM_STATE,
