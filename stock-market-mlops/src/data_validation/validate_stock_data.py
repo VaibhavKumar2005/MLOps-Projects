@@ -14,13 +14,16 @@ REQUIRED_COLUMNS: Final[list[str]] = [
     "Volume",
 ]
 
-PRICE_COLUMNS: Final[list[str]] = [
+PRICE_COLUMNS = [
     "Open",
     "High",
     "Low",
     "Close",
 ]
 
+MIN_PRICE = 0
+MIN_VOLUME = 0
+MAX_PRICE = 1_000_000
 
 class DataValidationError(Exception):
     """Raised when stock data validation fails."""
@@ -93,7 +96,9 @@ def _validate_ohlc(df: pd.DataFrame) -> None:
         if not passed.all():
             raise DataValidationError(message)
 
-
+class DataValidationError(Exception):
+    """Raised when stock data validation fails."""
+    
 def validate_stock_data(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
