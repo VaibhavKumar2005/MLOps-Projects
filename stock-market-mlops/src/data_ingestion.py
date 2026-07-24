@@ -3,8 +3,7 @@ import logging
 
 import yfinance as yf
 
-from data_validation.validate_stock_data import validate_stock_data
-
+from src.data_validation.validate_stock_data import validate_stock_data
 
 logging.basicConfig(
     level=logging.INFO,

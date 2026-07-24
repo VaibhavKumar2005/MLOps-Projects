@@ -11,7 +11,7 @@ import mlflow.sklearn
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
 from sklearn.model_selection import train_test_split
 
 try:
@@ -133,7 +133,7 @@ def _build_models() -> dict[str, tuple[object, dict[str, object]]]:
 def _evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series) -> dict[str, float]:
     predictions = model.predict(X_test)
     return {
-        "rmse": float(mean_squared_error(y_test, predictions, squared=False)),
+        "rmse": float(root_mean_squared_error(y_test, predictions)),
         "mae": float(mean_absolute_error(y_test, predictions)),
         "r2": float(r2_score(y_test, predictions)),
     }
