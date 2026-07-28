@@ -29,15 +29,15 @@ stages:
           cache: false
 
   train_model:
-    cmd: python -m src.train_model
+    cmd: python -m src.training.train_model
     deps:
-      - src/train_model.py
       - src/training/train_model.py
       - src/config.py
       - data/features
     outs:
       - models/model.pkl:
           cache: true
+
     metrics:
       - metrics/training.json:
           cache: false
