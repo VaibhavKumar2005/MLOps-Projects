@@ -37,14 +37,13 @@ stages:
     outs:
       - models/model.pkl:
           cache: true
-
     metrics:
       - metrics/training.json:
           cache: false
     plots:
       - metrics/model_performance.csv:
-          x: epoch
-          y: loss
+          x: model
+          y: rmse
 
   drift_monitoring:
     cmd: python -m src.drift_monitor
