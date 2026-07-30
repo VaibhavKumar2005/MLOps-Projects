@@ -6,13 +6,16 @@ from datetime import datetime
 from kafka import KafkaProducer
 from websocket import WebSocketApp
 
-from config import (
+from src.config import (
     KAFKA_BOOTSTRAP_SERVERS,
     KAFKA_CLIENT_ID,
     KAFKA_RAW_TOPIC,
     TWELVEDATA_API_KEY_ENV,
     TWELVEDATA_WS_URL,
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def build_producer():
@@ -46,8 +49,8 @@ def run_stream(symbols, api_key):
                 "volume": 0.0,
             }
             producer.send(KAFKA_RAW_TOPIC, key=data["symbol"], value=payload)
-        except Exception as e:
-            print(f"Error processing message: {e}")
+        except Exception:
+            logger.exception("Error processing websocket message")
     
     def on_error(_, error):
         print(f"WebSocket error: {error}")
@@ -87,8 +90,10 @@ def main():
     symbols = [s.strip().upper() for s in args.symbols.split(",") if s.strip()]
     if not symbols:
         raise ValueError("Provide at least one symbol.")
-    
-    print(f"Streaming live data for: {', '.join(symbols)}")
+
+
+    logger.info("Streaming live data for: %s", ", ".join(symbols))
+
     run_stream(symbols, api_key)
 
 
