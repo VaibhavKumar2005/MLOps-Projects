@@ -5,7 +5,8 @@ from kafka import KafkaConsumer
 
 from src.config import (
     KAFKA_BOOTSTRAP_SERVERS,
-    KAFKA_DRIFT_TOPIC,
+    KAFKA_DRIFT_ALERTS_TOPIC,
+    KAFKA_RETRAIN_GROUP_ID,
 )
 from src.training.train_model import train_model
 
