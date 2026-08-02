@@ -15,8 +15,9 @@ logger = logging.getLogger(__name__)
 
 def build_consumer():
     return KafkaConsumer(
-        KAFKA_DRIFT_TOPIC,
+        KAFKA_DRIFT_ALERTS_TOPIC,
         bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
+        group_id=KAFKA_RETRAIN_GROUP_ID,
         value_deserializer=lambda x: json.loads(x.decode("utf-8")),
         auto_offset_reset="latest",
         enable_auto_commit=True,
