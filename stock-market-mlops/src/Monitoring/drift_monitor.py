@@ -10,6 +10,7 @@ from src.config import (
     KAFKA_CLIENT_ID,
     KAFKA_FEATURES_TOPIC,
     KAFKA_DRIFT_ALERTS_TOPIC,
+    KAFKA_DRIFT_GROUP_ID,
 )
 
 
