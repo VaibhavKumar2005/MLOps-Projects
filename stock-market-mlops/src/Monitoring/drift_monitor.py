@@ -68,13 +68,16 @@ class DriftMonitor:
         
         self.drift_alerts = defaultdict(list)
         self.producer = self.build_producer()
-    
+
     def build_producer(self):
         """Build Kafka producer for alerts."""
         return KafkaProducer(
-            bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-            value_serializer=lambda v: json.dumps(v).encode("utf-8")
-        )
+        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
+        client_id=KAFKA_CLIENT_ID,
+        value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+        acks="all",
+        retries=3,
+    )
 
     def send_alert(self, metric_name, value, symbol, z_score):
         """Send drift alert to Kafka."""
@@ -89,6 +92,8 @@ class DriftMonitor:
             "timestamp": datetime.now().isoformat()
         }
         self.producer.send(KAFKA_DRIFT_ALERTS_TOPIC, alert_payload)
+        self.producer.flush()
+        future.get(timeout=10)
         logger.warning(f"🚨 DRIFT ALERT SENT: {symbol} {metric_name} z-score={z_score:.2f}")
 
     def set_baseline(self, metric_name, mean, std):
