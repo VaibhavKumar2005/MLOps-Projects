@@ -6,6 +6,9 @@ from src.config import (
     KAFKA_CLIENT_ID,
     KAFKA_RAW_TOPIC,
     KAFKA_FEATURES_TOPIC,
+    DATABRICKS_CATALOG,
+    DATABRICKS_RAW_SCHEMA,
+    DATABRICKS_PREDICTIONS_SCHEMA,
 )
 
 
@@ -29,3 +32,13 @@ def test_kafka_topics_format():
     assert isinstance(KAFKA_FEATURES_TOPIC, str)
     assert len(KAFKA_RAW_TOPIC) > 0
     assert len(KAFKA_FEATURES_TOPIC) > 0
+
+
+def test_databricks_config_exists():
+    """Test that Databricks configuration is properly loaded."""
+    assert isinstance(DATABRICKS_CATALOG, str)
+    assert isinstance(DATABRICKS_RAW_SCHEMA, str)
+    assert isinstance(DATABRICKS_PREDICTIONS_SCHEMA, str)
+    assert len(DATABRICKS_CATALOG) > 0
+    assert len(DATABRICKS_RAW_SCHEMA) > 0
+    assert len(DATABRICKS_PREDICTIONS_SCHEMA) > 0

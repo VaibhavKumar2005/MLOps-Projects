@@ -17,6 +17,11 @@ KAFKA_FEATURES_GROUP_ID = "stock-feature-engineering"
 KAFKA_DRIFT_GROUP_ID = "stock-drift-monitor"
 KAFKA_RETRAIN_GROUP_ID = "stock-retraining"
 
+# Databricks
+DATABRICKS_CATALOG = os.getenv("DATABRICKS_CATALOG", "stock_market_mlops")
+DATABRICKS_RAW_SCHEMA = os.getenv("DATABRICKS_RAW_SCHEMA", "raw_data")
+DATABRICKS_PREDICTIONS_SCHEMA = os.getenv("DATABRICKS_PREDICTIONS_SCHEMA", "predictions")
+
 # Twelve Data
 TWELVEDATA_WS_URL = "wss://ws.twelvedata.com/v1/quotes/price"
 TWELVEDATA_API_KEY_ENV = "TWELVEDATA_API_KEY"
